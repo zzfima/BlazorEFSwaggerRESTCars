@@ -1,0 +1,50 @@
+﻿@page "/engines/create"
+
+@using Microsoft.EntityFrameworkCore
+@inject IDbContextFactory<BlazorAppCar.Data.BlazorAppCarContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Create</PageTitle>
+
+<h1>Create</h1>
+
+<h4>Engine</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <EditForm method="post" Model="Engine" OnValidSubmit="AddEngine" FormName="create" Enhance>
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" />
+            <div class="mb-3">
+                <label for="hp" class="form-label">HP:</label> 
+                <InputNumber id="hp" @bind-Value="Engine.HP" class="form-control" /> 
+                <ValidationMessage For="() => Engine.HP" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="rpmmax" class="form-label">RpmMax:</label> 
+                <InputNumber id="rpmmax" @bind-Value="Engine.RpmMax" class="form-control" /> 
+                <ValidationMessage For="() => Engine.RpmMax" class="text-danger" /> 
+            </div>        
+            <button type="submit" class="btn btn-primary">Create</button>
+        </EditForm>
+    </div>
+</div>
+
+<div>
+    <a href="/engines">Back to List</a>
+</div>
+
+@code {
+
+    [SupplyParameterFromForm]
+    public Engine Engine { get; set; } = new();
+
+    // To protect from overposting attacks, see https://aka.ms/RazorPagesCRUD
+    public async Task AddEngine()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Engine.Add(Engine);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/engines");
+    }
+}

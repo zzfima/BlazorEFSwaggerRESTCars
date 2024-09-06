@@ -1,0 +1,48 @@
+﻿@page "/cars/details"
+
+@using Microsoft.EntityFrameworkCore
+@inject IDbContextFactory<BlazorAppCar.Data.BlazorAppCarContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Details</PageTitle>
+
+<h1>Details</h1>
+
+<div>
+    <h4>Car</h4>
+    <hr />
+    @if (car is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">Name</dt>
+            <dd class="col-sm-10">@car.Name</dd>
+            <dt class="col-sm-2">EngineId</dt>
+            <dd class="col-sm-10">@car.EngineId</dd>
+        </dl>
+        <div>
+            <a href="@($"/cars/edit?id={car.Id}")">Edit</a> |
+            <a href="@($"/cars")">Back to List</a>
+        </div>
+    }
+</div>
+
+@code {
+    Car? car;
+
+    [SupplyParameterFromQuery]
+    public int Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        car = await context.Car.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (car is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+}

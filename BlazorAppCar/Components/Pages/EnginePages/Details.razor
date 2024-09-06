@@ -1,0 +1,48 @@
+﻿@page "/engines/details"
+
+@using Microsoft.EntityFrameworkCore
+@inject IDbContextFactory<BlazorAppCar.Data.BlazorAppCarContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Details</PageTitle>
+
+<h1>Details</h1>
+
+<div>
+    <h4>Engine</h4>
+    <hr />
+    @if (engine is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">HP</dt>
+            <dd class="col-sm-10">@engine.HP</dd>
+            <dt class="col-sm-2">RpmMax</dt>
+            <dd class="col-sm-10">@engine.RpmMax</dd>
+        </dl>
+        <div>
+            <a href="@($"/engines/edit?id={engine.Id}")">Edit</a> |
+            <a href="@($"/engines")">Back to List</a>
+        </div>
+    }
+</div>
+
+@code {
+    Engine? engine;
+
+    [SupplyParameterFromQuery]
+    public int Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        engine = await context.Engine.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (engine is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+}

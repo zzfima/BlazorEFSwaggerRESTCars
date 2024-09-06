@@ -1,0 +1,38 @@
+﻿@page "/engines"
+
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using BlazorAppCar.Data
+@inject IDbContextFactory<BlazorAppCar.Data.BlazorAppCarContext> DbFactory
+@implements IAsyncDisposable
+
+<PageTitle>Index</PageTitle>
+
+<h1>Index</h1>
+
+<p>
+    <a href="engines/create">Create New</a>
+</p>
+
+<QuickGrid Class="table" Items="context.Engine">
+    <PropertyColumn Property="engine => engine.Id" />
+    <PropertyColumn Property="engine => engine.HP" />
+    <PropertyColumn Property="engine => engine.RpmMax" />
+
+    <TemplateColumn Context="engine">
+        <a href="@($"engines/edit?id={engine.Id}")">Edit</a> |
+        <a href="@($"engines/details?id={engine.Id}")">Details</a> |
+        <a href="@($"engines/delete?id={engine.Id}")">Delete</a>
+    </TemplateColumn>
+</QuickGrid>
+
+@code {
+    BlazorAppCarContext context = default!;
+
+    protected override void OnInitialized()
+    {
+        context = DbFactory.CreateDbContext();
+    }
+
+    public async ValueTask DisposeAsync() => await context.DisposeAsync();
+}
